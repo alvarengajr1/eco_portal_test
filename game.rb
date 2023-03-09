@@ -1,33 +1,36 @@
 class Game
   def initialize
     @board = ["0", "1", "2", "3", "4", "5", "6", "7", "8"]
-    @com = "X" # the computer's marker
-    @hum = "O" # the user's marker
+    @player_1 = "X"
+    @player_2 = "O"
     @gamemode = nil
   end
 
   def start_game
-    # start by printing the board
     set_gamemode
-    # loop through until the game was won or tied
     if (@gamemode == 1)
       print_board
       computer_x_human
     end
+
     if (@gamemode == 2)
       computer_x_computer
     end
-    
+
+    if (@gamemode == 3)
+      print_board
+      human_x_human
+    end
   end
 
-  def get_human_spot
+  def get_human_spot(player)
     spot = nil
     until spot
       puts "Enter [0-8]:"
       spot = gets.chomp.to_i
       if spot.between?(0,8)
         if @board[spot] != "X" && @board[spot] != "O"
-          @board[spot] = @hum
+          @board[spot] = player
         else
           spot = nil
           puts 'Invalid entry, please select another position'
@@ -65,13 +68,13 @@ class Game
       end
     end
     available_spaces.each do |as|
-      board[as.to_i] = @com
+      board[as.to_i] = @player_1
       if game_is_over(board)
         best_move = as.to_i
         board[as.to_i] = as
         return best_move
       else
-        board[as.to_i] = @hum
+        board[as.to_i] = @player_2
         if game_is_over(board)
           best_move = as.to_i
           board[as.to_i] = as
@@ -90,7 +93,6 @@ class Game
   end
 
   def game_is_over(b)
-
     [b[0], b[1], b[2]].uniq.length == 1 ||
     [b[3], b[4], b[5]].uniq.length == 1 ||
     [b[6], b[7], b[8]].uniq.length == 1 ||
@@ -127,9 +129,9 @@ end
 
 def computer_x_human
   until game_is_over(@board) || tie(@board)
-      get_human_spot
+      get_human_spot(@player_1)
       if !game_is_over(@board) && !tie(@board)
-        eval_board
+        eval_board(@player_2)
       end
       print_board
     end
@@ -139,15 +141,30 @@ def computer_x_human
     puts "Game over"
 end
 
+def human_x_human
+  until game_is_over(@board) || tie(@board)
+    puts 'player 1'
+    get_human_spot(@player_1)
+    print_board
+  if !game_is_over(@board) && !tie(@board)
+    puts 'player 2'
+    get_human_spot(@player_2)
+  end
+  print_board
+  end
+  if tie(@board)
+    puts "it's a tie!"
+  end
+  puts "Game over"
+end
+
 def computer_x_computer
   until game_is_over(@board) || tie(@board)
-    #aqui vai a jogada do computador um
-    eval_board(@hum)
+    eval_board(@player_1)
     print_board
     wait_interaction
     if !game_is_over(@board) && !tie(@board)
-      #aqui vai a jogada do computador dois
-      eval_board(@com)
+      eval_board(@player_2)
     end
     print_board
     wait_interaction
@@ -168,3 +185,4 @@ end
 
 game = Game.new
 game.start_game
+
